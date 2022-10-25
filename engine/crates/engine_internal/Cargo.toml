@@ -1,0 +1,11 @@
+[package]
+name = "engine_internal"
+version = "0.1.0"
+edition = "2021"
+description = "Use all crates for easier imports"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+engine_ecs = { path = "../engine_ecs"}
+engine_logger = { path = "../engine_logger"}
