@@ -9,12 +9,13 @@ use std::cell::{RefCell, RefMut};
 
 pub struct World{
     entities: usize,
+    free_ids: Vec<usize>,
     components: Vec<Box<dyn ComponentVec>>
 }
 
 impl World {
     pub fn new() -> Self{
-        Self { entities: 0, components: Vec::new() }
+        Self { entities: 0, free_ids: Vec::new(),  components: Vec::new() }
     }
 
     pub fn update(&mut self){
@@ -22,13 +23,31 @@ impl World {
     }
 
     pub fn add_entity(&mut self) -> usize{
-        
-        for component_vec in self.components.iter_mut(){
-            component_vec.push_none()
+        let id;
+        if !self.free_ids.is_empty() {
+            id = self.free_ids.pop().unwrap();
+        } else {
+            id = self.entities;
+            self.entities += 1;
+
+            for component_vec in self.components.iter_mut(){
+                component_vec.push_none()
+            };
         }
-        let entity_id = self.entities;
-        self.entities += 1;
-        entity_id
+        id
+        
+
+        
+    }
+
+    pub fn destroy_entity(&mut self, entity: usize){
+        let component_arrays = &mut self.components;
+
+        for array in component_arrays{
+            array.set_none(entity);
+        }
+
+        self.free_ids.push(entity);
     }
 
     pub fn add_component_to_entity<ComponentType: 'static>(
@@ -76,6 +95,7 @@ trait ComponentVec{
     fn as_any(&self) -> &dyn std::any::Any;
     fn as_any_mut(&mut self) -> &mut dyn std::any::Any;
     fn push_none(&mut self);
+    fn set_none(&mut self, index: usize);
 }
 
 
@@ -91,6 +111,10 @@ impl<T: 'static> ComponentVec for RefCell<Vec<Option<T>>>{
 
     fn push_none(&mut self) {
         self.get_mut().push(None);
+    }
+
+    fn set_none(&mut self, index: usize) {
+        self.get_mut()[index] = None;
     }
 }
 

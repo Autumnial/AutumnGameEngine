@@ -1,0 +1,24 @@
+{
+    "restoreTerminals.runOnStartup": false,
+    "restoreTerminals.terminals": [
+        {
+            "splitTerminals": [
+                {
+                    "name": "library",
+                    "commands": ["cd engine"]
+                },
+                {
+                    "name": "game",
+                    "commands": ["cd game"]
+                }
+            ]
+        },
+        {
+            "splitTerminals": [
+                {
+                    "name": "git"
+                }
+            ]
+        }
+    ]
+}
