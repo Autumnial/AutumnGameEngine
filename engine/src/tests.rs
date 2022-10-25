@@ -1,4 +1,5 @@
 mod tests{
+    #[allow(unused_imports)]
     use engine_internal::prelude::*;
 
     #[test]

@@ -35,9 +35,6 @@ impl World {
             };
         }
         id
-        
-
-        
     }
 
     pub fn destroy_entity(&mut self, entity: usize){
@@ -73,6 +70,22 @@ impl World {
 
         new_component_vec[entity] = Some(component);
         self.components.push(Box::new(RefCell::new(new_component_vec)));
+    }
+
+    pub fn remove_component_from_entity<ComponentType: 'static>(
+        &mut self,
+        entity: usize 
+    ){
+        for component_vec in self.components.iter_mut(){
+            if let Some(component_vec) = component_vec
+            .as_any_mut()
+            .downcast_mut::<RefCell<Vec<Option<ComponentType>>>>(){
+                component_vec.get_mut()[entity] = None;
+                return;
+            }
+        }
+
+        warning!("entity does not have component {}", std::any::type_name::<ComponentType>());
     }
 
     pub fn borrow_component_vec<ComponentType: 'static>(&self) -> RefMut<Vec<Option<ComponentType>>>{

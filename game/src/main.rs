@@ -4,6 +4,8 @@ struct Name(&'static str);
 
 struct Health(u32);
 
+struct NotARealComponent(u8);
+
 fn main(){
 
     let mut world = World::new();
@@ -17,15 +19,20 @@ fn main(){
     world.add_component_to_entity(ent1, Health(50));
     world.add_component_to_entity(ent2, Health(20));
 
+    world.remove_component_from_entity::<NotARealComponent>(ent1);
+    // world.remove_component_from_entity::<Health>(ent2);
+
     'main: loop{
 
         let mut health_vec = world.borrow_component_vec::<Health>();
         let mut name_vec =world.borrow_component_vec::<Name>();
         
         let zip = health_vec.iter_mut().zip(name_vec.iter_mut());
+        let iter = zip.filter_map(|(health, name)|
+            Some((health.as_mut()?, name.as_mut()?))
+        );
 
-        for (health, name) in zip.map(|(health, name)|{(health.as_mut().unwrap(), name.as_mut().unwrap())}
-        ){
+        for (health, name) in iter{
 
             if health.0 <= 0 {
                 println!("{} is dead!", name.0);
@@ -35,8 +42,8 @@ fn main(){
                 health.0 -= 10;
             }
  
-            println!();
         }
+        println!();
     };
 
 
